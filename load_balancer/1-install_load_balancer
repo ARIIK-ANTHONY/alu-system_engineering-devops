@@ -1,16 +1,27 @@
 #!/usr/bin/env bash
-# bash script that installs HAProxy & makes configurations to meet the following requirements:
+# bash script that installs HAProxy & makes configurations to meet the following requirements
 
-apt-get -y install software-properties-common
-add-apt-repository ppa:vbernat/haproxy-1.8
-apt-get update
-apt-get -y install haproxy
-echo "ENABLED=1" >> /etc/default/haproxy
-printf %s "listen 6187-web
+# Install necessary dependencies
+sudo apt-get -y install software-properties-common
+
+# Add the PPA repository for HAProxy 1.8
+sudo add-apt-repository ppa:vbernat/haproxy-1.8
+sudo apt-get update
+
+# Install HAProxy
+sudo apt-get -y install haproxy
+
+# Enable HAProxy to start on boot
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+
+# Configure HAProxy to load balancing web servers
+echo "listen 6187-web
     bind *:80
     mode http
     balance roundrobin
-    server 6402-web-01 54.204.203.255 :80 check
-    server 6402-web-02 3.94.57.32     :80 check
-" >> /etc/haproxy/haproxy.cfg
-sudo service haproxy restart
+    server web-01 54.204.203.255:80 check
+    server web-02 3.94.57.32:80 check
+" | sudo tee -a /etc/haproxy/haproxy.cfg
+
+# Restart HAProxy service to apply the new configuration
+sudo systemctl restart haproxy
