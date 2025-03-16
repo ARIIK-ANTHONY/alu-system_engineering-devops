@@ -73,7 +73,7 @@ frontend http_front
 backend http_back
     balance roundrobin
     server web-01 54.204.203.255:80 check
-    server web-02 3.94.57.32:80 check
+    server web-02 54.152.35.0:80 check
 EOF
 
 # Restart HAProxy to apply changes
