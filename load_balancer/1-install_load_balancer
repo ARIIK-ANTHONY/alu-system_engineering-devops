@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# bash script that installs HAProxy & makes configurations to meet the following requirements
 
 # Install necessary dependencies
+sudo apt-get -y update
 sudo apt-get -y install software-properties-common
 
 # Add the PPA repository for HAProxy 1.8
@@ -14,7 +14,7 @@ sudo apt-get -y install haproxy
 # Enable HAProxy to start on boot
 echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-# Configure HAProxy to load balancing web servers
+# Configure HAProxy to load balancing web servers (round-robin algorithm)
 echo "listen 6187-web
     bind *:80
     mode http
@@ -25,3 +25,6 @@ echo "listen 6187-web
 
 # Restart HAProxy service to apply the new configuration
 sudo systemctl restart haproxy
+
+# Check HAProxy status to ensure it's running
+sudo systemctl status haproxy
