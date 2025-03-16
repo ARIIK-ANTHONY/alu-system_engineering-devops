@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# This script installs and configures HAProxy to load balance between two web servers
+
 # Install necessary dependencies
 sudo apt-get -y update
 sudo apt-get -y install software-properties-common
