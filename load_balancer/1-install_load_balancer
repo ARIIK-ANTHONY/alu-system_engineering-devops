@@ -1,8 +1,28 @@
 #!/usr/bin/env bash
 # This script installs and configures HAProxy to load balance between two web servers
 
-# Install necessary dependencies
-sudo apt-get -y update
+# Define student ID (replace with your actual student ID)
+STUDENT_ID="your_student_id"  # Example: if your ID is 12345, use 12345
+
+# Set the hostname for both web servers
+hostnamectl set-hostname "${STUDENT_ID}-web-01"
+echo "127.0.1.1 ${STUDENT_ID}-web-01" | sudo tee -a /etc/hosts
+
+# Set the hostname for web-02 (for future web server setup)
+hostnamectl set-hostname "${STUDENT_ID}-web-02"
+echo "127.0.1.1 ${STUDENT_ID}-web-02" | sudo tee -a /etc/hosts
+
+# Install Nginx on both web servers and configure custom HTTP header
+sudo apt-get update
+sudo apt-get -y install nginx
+
+# Add custom HTTP header to Nginx configuration
+echo "add_header X-Served-By \$hostname;" | sudo tee -a /etc/nginx/nginx.conf
+
+# Restart Nginx to apply the changes
+sudo systemctl restart nginx
+
+# Install necessary dependencies for HAProxy
 sudo apt-get -y install software-properties-common
 
 # Add the PPA repository for HAProxy 1.8
@@ -64,3 +84,8 @@ sudo systemctl enable haproxy
 
 # Verify HAProxy status
 sudo systemctl status haproxy
+
+# Test the X-Served-By header response
+echo "Testing the X-Served-By header:"
+curl -Is http://54.204.203.255 | grep "X-Served-By"
+curl -Is http://3.94.57.32 | grep "X-Served-By"
