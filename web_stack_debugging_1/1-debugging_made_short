@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stop Nginx properly and restart it to serve a webpage
+# Stop, ensure Nginx is down, and restart it
 service nginx stop
 sleep 2
-service nginx start
+service nginx start || systemctl restart nginx
