@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Properly stop Nginx and confirm it is not running
+# Stop Nginx properly and restart it to serve a webpage
 service nginx stop
 sleep 2
-pkill -9 nginx
+service nginx start
