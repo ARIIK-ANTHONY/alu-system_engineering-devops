@@ -1,59 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# bash script that installs HAProxy & makes configurations to meet the following requirements:
 
-# Update the system and install HAProxy
-sudo apt update
-sudo apt install -y haproxy
-
-# Ensure HAProxy starts on boot
-sudo systemctl enable haproxy
-
-# Set up HAProxy configuration file with specific web server names
-cat <<EOF | sudo tee /etc/haproxy/haproxy.cfg
-# Global settings
-global
-    log /dev/log    local0
-    maxconn 2000
-    user haproxy
-    group haproxy
-
-# Default settings
-defaults
-    log     global
-    option  httplog
-    timeout connect 5000ms
-    timeout client  50000ms
-    timeout server  50000ms
-
-# Frontend settings
-frontend http-in
+apt-get -y install software-properties-common
+add-apt-repository ppa:vbernat/haproxy-1.8
+apt-get update
+apt-get -y install haproxy
+echo "ENABLED=1" >> /etc/default/haproxy
+printf %s "listen 6437-web
     bind *:80
-    default_backend servers
-
-# Backend settings for round-robin load balancing with server names
-backend servers
+    mode http
     balance roundrobin
-    server web-01 54.204.203.255:80 check  # Use the actual IP address for web-01
-    server web-02 54.152.35.0:80 check  # Use the actual IP address for web-02
-
-EOF
-
-# Reload HAProxy to apply the new configuration
-sudo systemctl restart haproxy
-
-# Check the status of HAProxy to verify if it's running properly
-sudo systemctl status haproxy
-
-# Ensure the web servers have the correct hostnames
-# You should replace the placeholder [STUDENT_ID] with your actual student ID
-
-# Set hostname for web-01
-sudo hostnamectl set-hostname [STUDENT_ID]-web-01  # Replace [STUDENT_ID] with your student ID
-
-# Optional: Set hostname for web-02 (if you're configuring this machine as web-02)
-# sudo hostnamectl set-hostname [STUDENT_ID]-web-02  # Uncomment for the second server
-
-# Output current hostname to verify
-hostname
-
-# Test the load balancer functionality (optional)
-curl -Is 52.87.224.121  # This should show which server (web-01 or web-02) is responding
+    server 6187-web-01 54.204.203.255:80 check
+    server 6187-web-02 54.152.35.0:80 check
+" >> /etc/haproxy/haproxy.cfg
+sudo service haproxy restart
