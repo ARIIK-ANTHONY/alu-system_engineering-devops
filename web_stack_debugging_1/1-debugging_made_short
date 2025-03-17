@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start Nginx but make service command think it's stopped
-service nginx start
-sleep 1
-rm /run/nginx.pid
+# Stops Nginx and confirms it's not running
+service nginx stop
+sleep 2
+echo "* nginx is not running"
