@@ -1,74 +1,59 @@
-#!/usr/bin/env bash
-# install load balancer
+#!/bin/bash
 
+# Update the system and install HAProxy
+sudo apt update
+sudo apt install -y haproxy
 
-sudo apt-get -y update
-sudo apt-get -y install haproxy
-sudo chown $USER:USER /etc/haproxy/haproxy.cfg
+# Ensure HAProxy starts on boot
+sudo systemctl enable haproxy
 
-echo "
-fronted cryptotechcoder
-   bind *:80
-   mode http
-   default_backend app
-
-backend app
-   balance roundrobin
-   server 439003-web-01 54.204.203.255:80 check
-   server 439003-web-02 54.152.35.0:80 check" >> /etc/haproxy/haproxy.cfg
-
-<<<<<<< HEAD
-# Configure HAProxy to load balance web servers (round-robin algorithm)
+# Set up HAProxy configuration file with specific web server names
 cat <<EOF | sudo tee /etc/haproxy/haproxy.cfg
+# Global settings
 global
     log /dev/log    local0
-    log /dev/log    local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
-    stats timeout 30s
+    maxconn 2000
     user haproxy
     group haproxy
-    daemon
 
+# Default settings
 defaults
     log     global
-    mode    http
     option  httplog
-    option  dontlognull
     timeout connect 5000ms
     timeout client  50000ms
     timeout server  50000ms
-    errorfile 400 /etc/haproxy/errors/400.http
-    errorfile 403 /etc/haproxy/errors/403.http
-    errorfile 408 /etc/haproxy/errors/408.http
-    errorfile 500 /etc/haproxy/errors/500.http
-    errorfile 502 /etc/haproxy/errors/502.http
-    errorfile 503 /etc/haproxy/errors/503.http
-    errorfile 504 /etc/haproxy/errors/504.http
 
-frontend http_front
+# Frontend settings
+frontend http-in
     bind *:80
-    default_backend http_back
+    default_backend servers
 
-backend http_back
+# Backend settings for round-robin load balancing with server names
+backend servers
     balance roundrobin
-    server web-01 54.204.203.255:80 check
-    server web-02 54.152.35.0:80 check
+    server web-01 54.204.203.255:80 check  # Use the actual IP address for web-01
+    server web-02 54.152.35.0:80 check  # Use the actual IP address for web-02
+
 EOF
 
-# Restart HAProxy to apply changes
+# Reload HAProxy to apply the new configuration
 sudo systemctl restart haproxy
 
-# Enable HAProxy to start on boot
-sudo systemctl enable haproxy
-
-# Verify HAProxy status
+# Check the status of HAProxy to verify if it's running properly
 sudo systemctl status haproxy
 
-# Test the X-Served-By header response
-echo "Testing the X-Served-By header:"
-curl -Is http://54.204.203.255 | grep "X-Served-By"
-curl -Is http://3.94.57.32 | grep "X-Served-By"
-=======
-sudo service haproxy restart   
->>>>>>> 9f81c19 (add changes)
+# Ensure the web servers have the correct hostnames
+# You should replace the placeholder [STUDENT_ID] with your actual student ID
+
+# Set hostname for web-01
+sudo hostnamectl set-hostname [STUDENT_ID]-web-01  # Replace [STUDENT_ID] with your student ID
+
+# Optional: Set hostname for web-02 (if you're configuring this machine as web-02)
+# sudo hostnamectl set-hostname [STUDENT_ID]-web-02  # Uncomment for the second server
+
+# Output current hostname to verify
+hostname
+
+# Test the load balancer functionality (optional)
+curl -Is 52.87.224.121  # This should show which server (web-01 or web-02) is responding
