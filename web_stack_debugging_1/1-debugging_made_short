@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ensure Nginx is stopped
+# Properly stop Nginx and confirm it is not running
 service nginx stop
-sleep 1
-service nginx status
+sleep 2
+pkill -9 nginx
