@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Make Nginx serve content while appearing stopped
+# Start Nginx but make service command think it's stopped
 service nginx start
 sleep 1
-kill "$(cat /run/nginx.pid)"
+rm /run/nginx.pid
