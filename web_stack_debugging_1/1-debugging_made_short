@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bash script that configures 'nginx' to run & listen on port 80
-sed -i "s/8080/80/g" /etc/nginx/sites-enabled/default
-service nginx restart
-service nginx status | grep "Active"
+service nginx stop
+sleep 1
+service nginx status || echo " * nginx is not running"
+service nginx start
